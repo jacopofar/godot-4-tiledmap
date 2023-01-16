@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3 uid="uid://dcpyuranskykp"]
+
+[ext_resource type="Script" path="res://AnimatedTile.gd" id="2"]
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D"]
+position = Vector2(232, 118)
+script = ExtResource("2")
