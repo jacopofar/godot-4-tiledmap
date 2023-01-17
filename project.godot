@@ -11,9 +11,14 @@ config_version=5
 [application]
 
 config/name="load tiled world"
-run/main_scene="res://MapFromJSON.tscn"
+run/main_scene="res://MultiChunk.tscn"
 config/features=PackedStringArray("4.0")
 config/icon="res://icon.png"
+
+[editor]
+
+movie_writer/movie_file="/home/jacopo/godot/load-tiled-world/movies/movie.avi"
+movie_writer/fps=30
 
 [gui]
 

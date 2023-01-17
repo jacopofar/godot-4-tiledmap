@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://v8j7tea5t4l6"]
+
+[ext_resource type="Script" path="res://MapChunk.gd" id="1_jplir"]
+
+[node name="Node" type="Node2D"]
+script = ExtResource("1_jplir")

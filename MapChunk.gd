@@ -1,6 +1,6 @@
-extends Node
+extends Node2D
 
-var map_url: String =  "https://jacopofarina.eu/experiments/reference_game/maps/first/chunk_0_0.json"
+@export var map_chunk_url: String
 var map_data: Dictionary
 var tilesets: Dictionary = {}
 var atlas_textures: Dictionary = {}
@@ -60,9 +60,9 @@ func get_tileset(tileset_url: String) -> Dictionary:
 func _ready():
 	var http_request_map = HTTPRequest.new()
 	add_child(http_request_map)
-	print("Map URL:", map_url)
+	print("Map URL:", map_chunk_url)
 	# Read the map
-	var error = http_request_map.request(map_url)
+	var error = http_request_map.request(map_chunk_url)
 	if error != OK:
 		push_error("An error occurred in the HTTP request.")
 	# will yield [_result, _response_code, _headers, body]
@@ -73,12 +73,12 @@ func _ready():
 	test_json_conv.parse(body.get_string_from_utf8())
 	map_data =  test_json_conv.get_data()
 
-	var map_url_base = map_url.left(map_url.rfind("/"))
+	var map_chunk_url_base = map_chunk_url.left(map_chunk_url.rfind("/"))
 
 	# now iterate over the tilesets referenced in the map
 	# for each download the JSON and the image
 	for tileset in map_data["tilesets"]:
-		var tileset_url = map_url_base + "/" + tileset["source"]
+		var tileset_url = map_chunk_url_base + "/" + tileset["source"]
 		# offset to add to the ids of the tileset
 		# so each tileset has a range of ids
 		# the same tileset may have different firstgid checked different maps
@@ -151,7 +151,6 @@ func draw_map():
 			tile_idx += 1
 			if gid == 0:
 				continue
-
 			var anim = get_animation_from_gid(gid)
 			if anim != null:
 				var anims = AnimatedSprite2D.new()
@@ -159,9 +158,7 @@ func draw_map():
 				anims.frames = anim
 				anims.play("anim")
 				add_child(anims)
-
 			else:
-
 				var this_atlas = get_atlas_from_gid(gid)
 				var ns = Sprite2D.new()
 
