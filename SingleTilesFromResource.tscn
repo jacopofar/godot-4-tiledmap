@@ -1,7 +1,0 @@
-[gd_scene load_steps=2 format=3 uid="uid://bl07r16qr2q7w"]
-
-[ext_resource type="Script" path="res://SingleTile.gd" id="1"]
-
-[node name="SingleTile" type="Sprite2D"]
-position = Vector2(226, 139)
-script = ExtResource("1")

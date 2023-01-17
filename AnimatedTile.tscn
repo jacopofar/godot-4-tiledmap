@@ -1,7 +1,41 @@
-[gd_scene load_steps=2 format=3 uid="uid://dcpyuranskykp"]
+[gd_scene load_steps=2 format=3 uid="uid://g4wlhrlw1qva"]
 
-[ext_resource type="Script" path="res://AnimatedTile.gd" id="2"]
+[sub_resource type="GDScript" id="GDScript_rj5vs"]
+script/source = "extends AnimatedSprite2D
+
+
+# Declare member variables here. Examples:
+# var a = 2
+# var b = \"text\"
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+	var texture = ResourceLoader.load(\"res://victorian-streets.png\", \"ImageTexture\")
+	var mytext1: AtlasTexture = AtlasTexture.new()
+	mytext1.set_atlas(texture)
+	mytext1.set_region(Rect2( 128, 128, 128, 128 ))
+	var mytext2: AtlasTexture = AtlasTexture.new()
+	mytext2.set_atlas(texture)
+	mytext2.set_region(Rect2( 256, 256, 128, 128 ))
+	var myframes = SpriteFrames.new()
+	myframes.add_animation(\"some-blinking\")
+	myframes.add_frame(\"some-blinking\", mytext1)
+	myframes.add_frame(\"some-blinking\", mytext2)
+	# assign myframes to this object to show it
+	frames = myframes
+	play(\"some-blinking\")
+	set_playing(true)
+	
+
+
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+#func _process(delta):
+#	pass
+"
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D"]
 position = Vector2(232, 118)
-script = ExtResource("2")
+script = SubResource("GDScript_rj5vs")
