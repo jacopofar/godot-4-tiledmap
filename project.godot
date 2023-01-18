@@ -19,6 +19,7 @@ config/icon="res://icon.png"
 
 movie_writer/movie_file="/home/jacopo/godot/load-tiled-world/movies/movie.avi"
 movie_writer/fps=30
+export/convert_text_resources_to_binary=true
 
 [gui]
 
