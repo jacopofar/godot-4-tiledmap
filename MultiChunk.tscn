@@ -4,3 +4,7 @@
 
 [node name="MultiChunk" type="Node2D"]
 script = ExtResource("1_3qmtf")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+current = true
+zoom = Vector2(0.1, 0.1)

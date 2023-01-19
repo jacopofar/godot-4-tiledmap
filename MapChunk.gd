@@ -66,12 +66,23 @@ func _ready():
 	if error != OK:
 		push_error("An error occurred in the HTTP request.")
 	# will yield [_result, _response_code, _headers, body]
-	var body = (await http_request_map.request_completed)[3]
+	var http_result = (await http_request_map.request_completed)
+	if int(http_result[1] / 100) != 2:
+		var color_rect = ColorRect.new()
+		color_rect.set_size(Vector2(200, 200))
+		color_rect.color = Color.MAGENTA
+		add_child(color_rect)
+		var error_lbl = Label.new()
+		error_lbl.text = "Error %s loading %s" % [http_result[1], map_chunk_url]
+		print(error_lbl.text)
+		add_child(error_lbl)
+		return
+	var body = http_result[3]
 
 
 	var test_json_conv = JSON.new()
 	test_json_conv.parse(body.get_string_from_utf8())
-	map_data =  test_json_conv.get_data()
+	map_data = test_json_conv.get_data()
 
 	var map_chunk_url_base = map_chunk_url.left(map_chunk_url.rfind("/"))
 
