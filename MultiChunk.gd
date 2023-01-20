@@ -116,9 +116,3 @@ func ensure_loaded(pos: Vector2):
 		loaded_chunks_rects.erase(delete_me)
 		loaded_chunks[delete_me].queue_free()
 		loaded_chunks.erase(delete_me)
-
-
-func _process(delta):
-	$"Camera2D".set_position($"Camera2D".position + Vector2(1, 1))
-	ensure_loaded($"Camera2D".position)
-	# $"Camera2D".set_zoom($"Camera2D".zoom * 0.99)
