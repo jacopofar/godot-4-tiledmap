@@ -5,7 +5,7 @@ var Chunk = preload("res://MapChunk.tscn")
 
 @export var map_world: String = "https://jacopofarina.eu/experiments/reference_game/maps/second/world.world"
 @export var load_threshold: int = 1000
-@export var unload_threshold: int = 1200
+@export var unload_threshold: int = 1600
 @export var reaction_squared_distance: int = 32 ** 2
 
 var path_format: String
@@ -21,7 +21,10 @@ var latest_position: Vector2 = Vector2(0, 0)
 var load_threshold_as_vector: Vector2
 var unload_threshold_as_vector: Vector2
 
+# maps the X_Y string with the chunk
 var loaded_chunks: Dictionary = {}
+# maps the X_Y string with the Rect2
+var loaded_chunks_rects: Dictionary = {}
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -53,7 +56,7 @@ func _ready():
 	multiplierY = int(world_data["patterns"][0]["multiplierY"])
 	offsetX = int(world_data["patterns"][0]["offsetX"])
 	offsetY = int(world_data["patterns"][0]["offsetY"])
-	max_offset = ceil(unload_threshold / min(multiplierX, multiplierY))
+	max_offset = 2 + ceil(load_threshold / min(multiplierX, multiplierY))
 	load_threshold_as_vector = Vector2(load_threshold, load_threshold)
 	unload_threshold_as_vector = Vector2(unload_threshold, unload_threshold)
 
@@ -72,11 +75,15 @@ func ensure_loaded(pos: Vector2):
 		pos - load_threshold_as_vector,
 		load_threshold_as_vector * 2
 	)
+	$ColorRect.set_position(loading_region.position)
+	$ColorRect.set_size(loading_region.size)
+
 	var unloading_region = Rect2(
 		pos - unload_threshold_as_vector,
 		unload_threshold_as_vector * 2
 	)
-
+	$ColorRectUnload.set_position(unloading_region.position)
+	$ColorRectUnload.set_size(unloading_region.size)
 	for ox in range(-max_offset, max_offset):
 		for oy in range(-max_offset, max_offset):
 			var this_ix = cur_chunk_x + ox
@@ -85,21 +92,21 @@ func ensure_loaded(pos: Vector2):
 			var this_chunk_idx = "%s_%s" % [this_ix, this_iy]
 			# print("examining", this_chunk_idx)
 			var chunk_rect = Rect2(
-				offsetX + (this_ix) * multiplierX,
-				offsetY + (this_iy) * multiplierY,
+				offsetX + this_ix * multiplierX,
+				offsetY + this_iy * multiplierY,
 				multiplierX,
 				multiplierY
 			)
-			# outside? unload if needed
-			if not chunk_rect.intersects(unloading_region):
-				if loaded_chunks.has(this_chunk_idx):
-					print("need to unload ", this_chunk_idx)
-					loaded_chunks[this_chunk_idx].queue_free()
-					loaded_chunks.erase(this_chunk_idx)
-					continue
 			# inside? load if needed
 			if chunk_rect.intersects(loading_region):
 				if not loaded_chunks.has(this_chunk_idx):
+					# show the chunk
+					var showthis = ColorRect.new()
+					showthis.color = Color(0.1, 0.1, 1, 0.5)
+					showthis.size = chunk_rect.size
+					showthis.position = chunk_rect.position
+					add_child(showthis)
+
 					print("need to load ", this_chunk_idx)
 					var new_chunk = Chunk.instantiate()
 					new_chunk.map_chunk_url = path_format % [this_ix, this_iy]
@@ -110,6 +117,18 @@ func ensure_loaded(pos: Vector2):
 						offsetY + (this_iy) * multiplierY
 					))
 					loaded_chunks[this_chunk_idx] = new_chunk
+					loaded_chunks_rects[this_chunk_idx] = chunk_rect
+	var delete_us = PackedStringArray([])
+	for candidate_to_delete in loaded_chunks_rects:
+		# outside? unload if needed
+		if not loaded_chunks_rects[candidate_to_delete].intersects(unloading_region):
+			print("unloading area does not contain", candidate_to_delete)
+			delete_us.append(candidate_to_delete)
+	for delete_me in delete_us:
+		loaded_chunks_rects.erase(delete_me)
+		loaded_chunks[delete_me].queue_free()
+		loaded_chunks.erase(delete_me)
+
 
 func _process(delta):
 	$"Camera2D".set_position($"Camera2D".position + Vector2(1, 1))

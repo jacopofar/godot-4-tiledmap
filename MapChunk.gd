@@ -6,6 +6,14 @@ var tilesets: Dictionary = {}
 var atlas_textures: Dictionary = {}
 var animated_frames: Dictionary = {}
 
+# size in amount of tiles
+var height_in_tiles: int = -1
+var width_in_tiles: int = -1
+
+# pixel size of a single tile
+var tile_height: int = -1
+var tile_width: int = -1
+
 # retrieves a tileset from an URL
 # notice this is asynchronous, call it with: await get_tileset(tileset_url).completed
 func get_tileset(tileset_url: String) -> Dictionary:
@@ -86,6 +94,12 @@ func _ready():
 
 	var map_chunk_url_base = map_chunk_url.left(map_chunk_url.rfind("/"))
 
+	height_in_tiles = int(map_data["height"])
+	width_in_tiles = int(map_data["width"])
+
+	tile_height = int(map_data["tileheight"])
+	tile_width = int(map_data["tilewidth"])
+
 	# now iterate over the tilesets referenced in the map
 	# for each download the JSON and the image
 	for tileset in map_data["tilesets"]:
@@ -147,25 +161,26 @@ func draw_map():
 	for layer in map_data["layers"]:
 		if layer["type"] != "tilelayer":
 			continue
+		# layer origin (is always 0 with the current Tiled version, should it just be removed?)
 		var x = layer["x"]
 		var y = layer["y"]
-		var height = int(layer["height"])
-		var width = int(layer["width"])
+
 		var data = layer["data"]
 
 		var tile_idx: int = 0
+	
 		while tile_idx < data.size():
 			var gid = data[tile_idx]
 			# tile position in the map
-			var pos_rel_x = tile_idx % width
-			var pos_rel_y = floor(tile_idx / width)
+			var pos_rel_x = tile_idx % width_in_tiles
+			var pos_rel_y = floor(tile_idx / width_in_tiles)
 			tile_idx += 1
 			if gid == 0:
 				continue
 			var anim = get_animation_from_gid(gid)
 			if anim != null:
 				var anims = AnimatedSprite2D.new()
-				anims.set_position(Vector2((pos_rel_x * height) + x, (pos_rel_y * width) + y))
+				anims.set_position(Vector2((pos_rel_x * tile_height) + x, (pos_rel_y * tile_width) + y))
 				anims.frames = anim
 				anims.play("anim")
 				add_child(anims)
@@ -173,6 +188,6 @@ func draw_map():
 				var this_atlas = get_atlas_from_gid(gid)
 				var ns = Sprite2D.new()
 
-				ns.set_position(Vector2((pos_rel_x * height) + x, (pos_rel_y * width) + y))
+				ns.set_position(Vector2((pos_rel_x * tile_height) + x, (pos_rel_y * tile_width) + y))
 				ns.set_texture(this_atlas)
 				add_child(ns)
