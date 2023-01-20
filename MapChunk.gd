@@ -168,7 +168,7 @@ func draw_map():
 		var data = layer["data"]
 
 		var tile_idx: int = 0
-	
+
 		while tile_idx < data.size():
 			var gid = data[tile_idx]
 			# tile position in the map

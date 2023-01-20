@@ -75,15 +75,10 @@ func ensure_loaded(pos: Vector2):
 		pos - load_threshold_as_vector,
 		load_threshold_as_vector * 2
 	)
-	$ColorRect.set_position(loading_region.position)
-	$ColorRect.set_size(loading_region.size)
-
 	var unloading_region = Rect2(
 		pos - unload_threshold_as_vector,
 		unload_threshold_as_vector * 2
 	)
-	$ColorRectUnload.set_position(unloading_region.position)
-	$ColorRectUnload.set_size(unloading_region.size)
 	for ox in range(-max_offset, max_offset):
 		for oy in range(-max_offset, max_offset):
 			var this_ix = cur_chunk_x + ox
@@ -100,13 +95,6 @@ func ensure_loaded(pos: Vector2):
 			# inside? load if needed
 			if chunk_rect.intersects(loading_region):
 				if not loaded_chunks.has(this_chunk_idx):
-					# show the chunk
-					var showthis = ColorRect.new()
-					showthis.color = Color(0.1, 0.1, 1, 0.5)
-					showthis.size = chunk_rect.size
-					showthis.position = chunk_rect.position
-					add_child(showthis)
-
 					print("need to load ", this_chunk_idx)
 					var new_chunk = Chunk.instantiate()
 					new_chunk.map_chunk_url = path_format % [this_ix, this_iy]
