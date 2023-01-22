@@ -4,6 +4,7 @@ extends CharacterBody2D
 @export var speed: int = 150
 @export var interaction_range: float = 50.0
 
+var is_loading: bool = true
 var keyboard_pressed: bool = false
 var mouse_pressed: bool = false
 var touch_pressed: bool = false
@@ -11,8 +12,10 @@ var touch_initial_direction: Vector2 =  Vector2(0, 1)
 
 
 func _physics_process(delta):
+	if is_loading:
+		return
 	var direction: Vector2
-
+	var action_present: bool = true
 	if mouse_pressed:
 		direction = position.direction_to(get_global_mouse_position())
 	elif touch_pressed:
@@ -20,37 +23,38 @@ func _physics_process(delta):
 	elif keyboard_pressed:
 		direction.x = Input.get_action_strength("ui_right") - Input.get_action_strength("ui_left")
 		direction.y = Input.get_action_strength("ui_down") - Input.get_action_strength("ui_up")
-
+	else:
+		action_present = false
 
 	# avoid diagonal movement
 	if abs(direction.x) > abs(direction.y):
 		direction.y = 0
-		# TODO animation not yet configured
-		# if direction.x > 0:
-		# 	$AnimationPlayer.play("right")
-		# else:
-		# 	$AnimationPlayer.play("left")
+		if action_present:
+			if direction.x > 0:
+				$AnimatedSpriteFromSheet.play("right")
+			else:
+				$AnimatedSpriteFromSheet.play("left")
 	else:
 		direction.x = 0
-		# TODO animation not yet configured
-		# if direction.y > 0:
-		# 	$AnimationPlayer.play("down")
-		# else:
-		# 	$AnimationPlayer.play("up")
+		if action_present:
+			if direction.y > 0:
+				$AnimatedSpriteFromSheet.play("down")
+			else:
+				$AnimatedSpriteFromSheet.play("up")
 	if direction.x == 0 and direction.y == 0:
-		# TODO animation not yet configured
-		# $AnimationPlayer.stop()
+		$AnimatedSpriteFromSheet.stop()
 		pass
 	else:
 		# try a movement only if there is something to do
 		direction = direction.normalized()
 		var movement = speed * direction * delta
-		# warning-ignore:return_value_discarded
 		move_and_collide(movement)
 		$RayCast2D.target_position = direction.normalized() * 32
 
 
 func _unhandled_input(event):
+	if is_loading:
+		return
 	# see https://docs.godotengine.org/en/latest/tutorials/inputs/inputevent.html
 	var is_interaction = false
 	if event.is_action_pressed("interact"):
@@ -94,3 +98,8 @@ func _unhandled_input(event):
 				target.on_interact()
 			else:
 				print_debug("Cannot interact with this")
+
+func _on_animated_sprite_from_sheet_load_complete():
+	is_loading = false
+	# TODO this initialization should be in the game JSON
+	$AnimatedSpriteFromSheet.play("down")

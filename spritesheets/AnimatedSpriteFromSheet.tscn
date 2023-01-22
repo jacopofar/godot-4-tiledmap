@@ -1,0 +1,9 @@
+[gd_scene load_steps=3 format=3 uid="uid://c6cwkr7rfgc2m"]
+
+[ext_resource type="Script" path="res://spritesheets/AnimatedSpriteFromSheet.gd" id="1_g6i3q"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_pssjo"]
+
+[node name="AnimatedSpriteFromSheet" type="AnimatedSprite2D"]
+frames = SubResource("SpriteFrames_pssjo")
+script = ExtResource("1_g6i3q")

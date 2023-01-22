@@ -76,7 +76,6 @@ func ensure_loaded(pos: Vector2):
 	# indexes of the current chunk
 	var cur_chunk_x = floor((pos.x - offsetX) / multiplierX)
 	var cur_chunk_y = floor((pos.y - offsetY) / multiplierY)
-	print("Load triggered, will load ", cur_chunk_x, ",", cur_chunk_y)
 	var loading_region = Rect2(
 		pos - load_threshold_as_vector,
 		load_threshold_as_vector * 2
