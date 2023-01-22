@@ -19,7 +19,7 @@ func load_json(url: String):
 	# will yield _result, _response_code, _headers, body
 	var http_result = (await http_request.request_completed)
 	if int(http_result[1] / 100) != 2:
-		push_error("Non-200 HTTP code ", http_result[1], " with URL ", url)
+		return [str("Non-200 HTTP code ", http_result[1]), null]
 	var body = http_result[3]
 	var json = JSON.new()
 	json.parse(body.get_string_from_utf8())
@@ -31,7 +31,6 @@ func load_json(url: String):
 
 func load_image(url: String):
 	if image_cache.has(url):
-		print("CACHE HIT ", url)
 		return [null, image_cache[url]]
 	var http_request = HTTPRequest.new()
 	add_child(http_request)

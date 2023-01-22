@@ -15,18 +15,6 @@ var spritesheet_texture: ImageTexture
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	# var http_request_spritesheet = HTTPRequest.new()
-	# add_child(http_request_spritesheet)
-	# print("Spritesheet URL:", spritesheet_url)
-	# var error = http_request_spritesheet.request(spritesheet_url)
-	# if error != OK:
-	# 	push_error("An error occurred in the HTTP request.")
-	# # will yield [_result, _response_code, _headers, body]
-	# var http_result = (await http_request_spritesheet.request_completed)
-	# if int(http_result[1] / 100) != 2:
-	# 	# TODO handle error here
-	# 	return
-	# var body = http_result[3]
 	var req = await HttpLoader.load_json(spritesheet_url)
 	spritesheet_data = req[1]
 

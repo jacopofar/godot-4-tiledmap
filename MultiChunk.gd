@@ -80,7 +80,6 @@ func ensure_loaded(pos: Vector2):
 			var this_iy = cur_chunk_y + oy
 
 			var this_chunk_idx = "%s_%s" % [this_ix, this_iy]
-			# print("examining", this_chunk_idx)
 			var chunk_rect = Rect2(
 				offsetX + this_ix * multiplierX,
 				offsetY + this_iy * multiplierY,

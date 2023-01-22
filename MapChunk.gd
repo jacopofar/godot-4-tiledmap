@@ -46,31 +46,19 @@ func get_tileset(tileset_url: String) -> Dictionary:
 	return tileset
 
 func _ready():
-	var http_request_map = HTTPRequest.new()
-	add_child(http_request_map)
-	print("Map URL:", map_chunk_url)
-	# Read the map
-	var error = http_request_map.request(map_chunk_url)
-	if error != OK:
-		push_error("An error occurred in the HTTP request.")
-	# will yield [_result, _response_code, _headers, body]
-	var http_result = (await http_request_map.request_completed)
-	if int(http_result[1] / 100) != 2:
+	var req = await HttpLoader.load_json(map_chunk_url)
+	if req[0] != null:
 		var color_rect = ColorRect.new()
 		color_rect.set_size(Vector2(200, 200))
 		color_rect.color = Color.MAGENTA
 		add_child(color_rect)
 		var error_lbl = Label.new()
-		error_lbl.text = "Error %s loading %s" % [http_result[1], map_chunk_url]
+		error_lbl.text = "%s %s" % [req[0], map_chunk_url]
 		print(error_lbl.text)
 		add_child(error_lbl)
 		return
-	var body = http_result[3]
 
-
-	var test_json_conv = JSON.new()
-	test_json_conv.parse(body.get_string_from_utf8())
-	map_data = test_json_conv.get_data()
+	map_data = req[1]
 
 	var map_chunk_url_base = map_chunk_url.left(map_chunk_url.rfind("/"))
 
