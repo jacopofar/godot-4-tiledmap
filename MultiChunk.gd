@@ -10,13 +10,13 @@ var Chunk = preload("res://MapChunk.tscn")
 
 var path_format: String
 
-var multiplierX: int
-var multiplierY: int
-var offsetX: int
-var offsetY: int
+var multiplierX: int = -1
+var multiplierY: int = -1
+var offsetX: int = -1
+var offsetY: int = -1
 
 var max_offset: int = -1
-# TODO how to initialize this? at the first load should be triggered
+var never_loaded: bool = true
 var latest_position: Vector2 = Vector2(0, 0)
 var load_threshold_as_vector: Vector2
 var unload_threshold_as_vector: Vector2
@@ -59,18 +59,24 @@ func _ready():
 	max_offset = 2 + ceil(load_threshold / min(multiplierX, multiplierY))
 	load_threshold_as_vector = Vector2(load_threshold, load_threshold)
 	unload_threshold_as_vector = Vector2(unload_threshold, unload_threshold)
+	# map data was just loaded, mark this as lot loaded yet
+	never_loaded = true
 
 # ensure the chunks around the given position are loaded
 # and if needed unloads the ones too distant to be useful
 func ensure_loaded(pos: Vector2):
-	# when the change is too small, don't do anything
-	if latest_position.distance_squared_to(pos) < reaction_squared_distance:
-		return
+	# first load? Ignore the distance and load, but onyl once
+	if never_loaded:
+		never_loaded = false
+	else:
+		# when the change is too small, don't do anything
+		if latest_position.distance_squared_to(pos) < reaction_squared_distance:
+			return
 	latest_position = pos
 	# indexes of the current chunk
 	var cur_chunk_x = floor((pos.x - offsetX) / multiplierX)
 	var cur_chunk_y = floor((pos.y - offsetY) / multiplierY)
-
+	print("Load triggered, will load ", cur_chunk_x, ",", cur_chunk_y)
 	var loading_region = Rect2(
 		pos - load_threshold_as_vector,
 		load_threshold_as_vector * 2
