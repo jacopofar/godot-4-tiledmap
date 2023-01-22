@@ -15,6 +15,10 @@ run/main_scene="res://Game.tscn"
 config/features=PackedStringArray("4.0")
 config/icon="res://icon.png"
 
+[autoload]
+
+HttpLoader="*res://loaders/HTTPLoader.tscn"
+
 [editor]
 
 movie_writer/movie_file="/home/jacopo/godot/load-tiled-world/movies/movie.avi"

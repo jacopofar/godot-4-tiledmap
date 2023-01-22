@@ -26,24 +26,14 @@ var loaded_chunks: Dictionary = {}
 # maps the X_Y string with the Rect2
 var loaded_chunks_rects: Dictionary = {}
 
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	var http_request_world = HTTPRequest.new()
-	add_child(http_request_world)
-	# download the JSON for the world
-	var error = http_request_world.request(map_world)
-	# will yield _result, _response_code, _headers, body
-	var body = (await http_request_world.request_completed)[3]
-	if error != OK:
-		push_error("An error occurred in the HTTP request.")
-	var world_json = JSON.new()
-	world_json.parse(body.get_string_from_utf8())
-	var world_data =  world_json.get_data()
+	var world_data = (await HttpLoader.load_json(map_world))[1]
 	assert(world_data["type"] == "world")
 	# example "regexp": "chunk_(\\-?\\d+)_(\\-?\\d+)\\.json"
 	var regex = RegEx.new()
 	regex.compile("(.+)\\([^\\)]+\\)(.+)\\([^\\)]+\\)(.+)")
-	print("input will be ", world_data["patterns"][0]["regexp"])
 	var result = regex.search(world_data["patterns"][0]["regexp"])
 	# the string as a whole, and the 3 parts
 	assert(result.strings.size() == 4)
@@ -100,10 +90,8 @@ func ensure_loaded(pos: Vector2):
 			# inside? load if needed
 			if chunk_rect.intersects(loading_region):
 				if not loaded_chunks.has(this_chunk_idx):
-					print("need to load ", this_chunk_idx)
 					var new_chunk = Chunk.instantiate()
 					new_chunk.map_chunk_url = path_format % [this_ix, this_iy]
-					print("This is going to be ", new_chunk.map_chunk_url)
 					add_child(new_chunk)
 					new_chunk.set_position(Vector2(
 						offsetX + (this_ix) * multiplierX,
@@ -115,7 +103,6 @@ func ensure_loaded(pos: Vector2):
 	for candidate_to_delete in loaded_chunks_rects:
 		# outside? unload if needed
 		if not loaded_chunks_rects[candidate_to_delete].intersects(unloading_region):
-			print("unloading area does not contain", candidate_to_delete)
 			delete_us.append(candidate_to_delete)
 	for delete_me in delete_us:
 		loaded_chunks_rects.erase(delete_me)

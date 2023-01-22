@@ -19,18 +19,8 @@ var tile_width: int = -1
 func get_tileset(tileset_url: String) -> Dictionary:
 	var base_url = tileset_url.left(tileset_url.rfind("/"))
 	var tileset = {}
-	var http_request_tilesets = HTTPRequest.new()
-	add_child(http_request_tilesets)
-	# download the JSON for the tileset
-	var error = http_request_tilesets.request(tileset_url)
-	# will yield _result, _response_code, _headers, body
-	var body = (await http_request_tilesets.request_completed)[3]
-	if error != OK:
-		push_error("An error occurred in the HTTP request.")
 
-	var test_json_conv = JSON.new()
-	test_json_conv.parse(body.get_string_from_utf8())
-	var tileset_data =  test_json_conv.get_data()
+	var tileset_data = (await HttpLoader.load_json(tileset_url))[1]
 	tileset["tile_width"] = int(tileset_data["tilewidth"])
 	tileset["tile_height"] = int(tileset_data["tileheight"])
 	tileset["image_width"] = int(tileset_data["imagewidth"])
@@ -50,17 +40,7 @@ func get_tileset(tileset_url: String) -> Dictionary:
 				tileset["animations"][int(tile_extra_metadata["id"])] = gid_frames
 
 	# now download the image for the tileset
-	var http_request_tileset_image = HTTPRequest.new()
-	add_child(http_request_tileset_image)
-	error = http_request_tileset_image.request(base_url + "/" + tileset_data["image"])
-	body = (await http_request_tileset_image.request_completed)[3]
-	if error != OK:
-		push_error("An error occurred in the HTTP request.")
-
-	var image = Image.new()
-	error = image.load_png_from_buffer(body)
-	if error != OK:
-		push_error("An error occurred loading the image.")
+	var image = (await HttpLoader.load_image(base_url + "/" + tileset_data["image"]))[1]
 	var texture = ImageTexture.create_from_image(image)
 	tileset["texture"] = texture
 	return tileset

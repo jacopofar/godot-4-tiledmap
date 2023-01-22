@@ -15,37 +15,25 @@ var spritesheet_texture: ImageTexture
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	var http_request_spritesheet = HTTPRequest.new()
-	add_child(http_request_spritesheet)
-	print("Spritesheet URL:", spritesheet_url)
-	var error = http_request_spritesheet.request(spritesheet_url)
-	if error != OK:
-		push_error("An error occurred in the HTTP request.")
-	# will yield [_result, _response_code, _headers, body]
-	var http_result = (await http_request_spritesheet.request_completed)
-	if int(http_result[1] / 100) != 2:
-		# TODO handle error here
-		return
-	var body = http_result[3]
+	# var http_request_spritesheet = HTTPRequest.new()
+	# add_child(http_request_spritesheet)
+	# print("Spritesheet URL:", spritesheet_url)
+	# var error = http_request_spritesheet.request(spritesheet_url)
+	# if error != OK:
+	# 	push_error("An error occurred in the HTTP request.")
+	# # will yield [_result, _response_code, _headers, body]
+	# var http_result = (await http_request_spritesheet.request_completed)
+	# if int(http_result[1] / 100) != 2:
+	# 	# TODO handle error here
+	# 	return
+	# var body = http_result[3]
+	var req = await HttpLoader.load_json(spritesheet_url)
+	spritesheet_data = req[1]
 
-
-	var test_json_conv = JSON.new()
-	test_json_conv.parse(body.get_string_from_utf8())
-	spritesheet_data = test_json_conv.get_data()
 	# Now load the image data
 	# NOTE: it assumes it's a single PNG file
 	var base_url = spritesheet_url.left(spritesheet_url.rfind("/"))
-	var http_request_spritesheet_image = HTTPRequest.new()
-	add_child(http_request_spritesheet_image)
-	error = http_request_spritesheet_image.request(base_url + "/" + spritesheet_data["meta"]["image"])
-	body = (await http_request_spritesheet_image.request_completed)[3]
-	if error != OK:
-		push_error("An error occurred in the HTTP request.")
-
-	var image = Image.new()
-	error = image.load_png_from_buffer(body)
-	if error != OK:
-		push_error("An error occurred loading the image.")
+	var image = (await HttpLoader.load_image(base_url + "/" + spritesheet_data["meta"]["image"]))[1]
 	spritesheet_texture = ImageTexture.create_from_image(image)
 	for frame_name in spritesheet_data["frames"].keys():
 		var anim_name = frame_name.left(frame_name.rfind("-"))

@@ -1,7 +1,7 @@
 extends CharacterBody2D
 
 # Player movement speed
-@export var speed: int = 150
+@export var speed: int = 200
 @export var interaction_range: float = 50.0
 
 var is_loading: bool = true
