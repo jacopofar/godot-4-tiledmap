@@ -59,13 +59,3 @@ func _ready():
 			))
 			frames.add_frame(anim_name, thisatlas)
 	emit_signal("load_complete")
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta):
-	pass
-
-
-func _on_timer_timeout():
-	print("TIMER TRIGGERED")
-	var directions: Array = ["up", "down", "left", "right"]
-	play(directions.pick_random())
