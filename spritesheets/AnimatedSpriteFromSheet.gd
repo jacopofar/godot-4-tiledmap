@@ -9,7 +9,7 @@ signal load_complete
 # 5. Each frame is as-is, no rotation, scaling or reflection
 # These may change, particularly 2 and 4 are easily done with Godot 4.x
 
-@export var spritesheet_url: String = "https://jacopofarina.eu/experiments/reference_game/spritesheets/MainGuySpriteSheet.json"
+@export var spritesheet_url: String
 var spritesheet_data: Dictionary
 var spritesheet_texture: ImageTexture
 
@@ -26,10 +26,10 @@ func _ready():
 	for frame_name in spritesheet_data["frames"].keys():
 		var anim_name = frame_name.left(frame_name.rfind("-"))
 		# is this a frame of an animation already added? if so ignore it
-		if frames.get_animation_names().has(anim_name):
+		if sprite_frames.get_animation_names().has(anim_name):
 			continue
 			# it's new, so add ALL possible frames
-		frames.add_animation(anim_name)
+		sprite_frames.add_animation(anim_name)
 		# to avoid assumptions on the order of the keys in the JSON,
 		# just go by index and look for each possible key until they are over
 		for i in range(0, 100):
@@ -45,5 +45,5 @@ func _ready():
 				relevant_frame["w"],
 				relevant_frame["h"],
 			))
-			frames.add_frame(anim_name, thisatlas)
+			sprite_frames.add_frame(anim_name, thisatlas)
 	emit_signal("load_complete")

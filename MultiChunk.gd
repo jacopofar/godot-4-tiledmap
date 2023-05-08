@@ -3,7 +3,7 @@ extends Node2D
 # This parses a Tiled world file and loads/unloads chunks based on the position
 var Chunk = preload("res://MapChunk.tscn")
 
-@export var map_world: String = "https://jacopofarina.eu/experiments/reference_game/maps/second/world.world"
+@export var map_world: String
 @export var load_threshold: int = 1000
 @export var unload_threshold: int = 1600
 @export var reaction_squared_distance: int = 32 ** 2
@@ -29,6 +29,7 @@ var loaded_chunks_rects: Dictionary = {}
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
+	print("WORLD URL: ", map_world)
 	var world_data = (await HttpLoader.load_json(map_world))[1]
 	assert(world_data["type"] == "world")
 	# example "regexp": "chunk_(\\-?\\d+)_(\\-?\\d+)\\.json"
