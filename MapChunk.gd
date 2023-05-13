@@ -126,7 +126,14 @@ func get_animation_from_gid(gid:int) -> SpriteFrames:
 		return null
 
 func draw_map():
+	# NOTE: non-tilelayer layers contribute to the z_index logic too
+	# assume that the "middle" layer is 0
+	
+	var current_z_index = -10 - (10 * int(len(map_data["layers"]) / 2))
 	for layer in map_data["layers"]:
+		current_z_index += 10
+		print(current_z_index)
+		print(layer["type"])
 		if layer["type"] != "tilelayer":
 			continue
 		# layer origin (is always 0 with the current Tiled version, should it just be removed?)
@@ -151,6 +158,7 @@ func draw_map():
 				anims.set_position(Vector2((pos_rel_x * tile_height) + x, (pos_rel_y * tile_width) + y))
 				anims.frames = anim
 				anims.play("anim")
+				anims.set_z_index(current_z_index)
 				add_child(anims)
 			else:
 				var this_atlas = get_atlas_from_gid(gid)
@@ -158,4 +166,5 @@ func draw_map():
 
 				ns.set_position(Vector2((pos_rel_x * tile_height) + x, (pos_rel_y * tile_width) + y))
 				ns.set_texture(this_atlas)
+				ns.set_z_index(current_z_index)
 				add_child(ns)

@@ -15,7 +15,7 @@ func _ready():
 	character_sprite_animations.set_name("AnimatedSpriteFromSheet")
 	character_sprite_animations.load_complete.connect($PlayerCharacter._on_animated_sprite_from_sheet_load_complete)
 	$PlayerCharacter.add_child(character_sprite_animations)
-
+	$PlayerCharacter.set_z_index(100)
 	var multichunk = MultiChunk.instantiate()
 	multichunk.map_world = base_url + "/" + game_data["initialWorld"]
 	multichunk.set_name("MultiChunk")
@@ -25,5 +25,5 @@ func _ready():
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta):
+func _process(_delta):
 	$MultiChunk.ensure_loaded($PlayerCharacter.position)
