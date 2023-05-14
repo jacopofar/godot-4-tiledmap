@@ -19,7 +19,6 @@ var tile_width: int = -1
 func get_tileset(tileset_url: String) -> Dictionary:
 	var base_url = tileset_url.left(tileset_url.rfind("/"))
 	var tileset = {}
-
 	var tileset_data = (await HttpLoader.load_json(tileset_url))[1]
 	tileset["tile_width"] = int(tileset_data["tilewidth"])
 	tileset["tile_height"] = int(tileset_data["tileheight"])
@@ -71,7 +70,8 @@ func _ready():
 	# now iterate over the tilesets referenced in the map
 	# for each download the JSON and the image
 	for tileset in map_data["tilesets"]:
-		var tileset_url = map_chunk_url_base + "/" + tileset["source"]
+		# escape the whitsepace but not everything, things like "../" are ot be kept
+		var tileset_url = map_chunk_url_base + "/" + tileset["source"].replace(" ", "%20")
 		# offset to add to the ids of the tileset
 		# so each tileset has a range of ids
 		# the same tileset may have different firstgid checked different maps
