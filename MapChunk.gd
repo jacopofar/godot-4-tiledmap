@@ -39,7 +39,8 @@ func get_tileset(tileset_url: String) -> Dictionary:
 				tileset["animations"][int(tile_extra_metadata["id"])] = gid_frames
 
 	# now download the image for the tileset
-	var image = (await HttpLoader.load_image(base_url + "/" + tileset_data["image"]))[1]
+	# escape the whitsepace but not everything, things like "../" are to be kept
+	var image = (await HttpLoader.load_image(base_url + "/" + tileset_data["image"].replace(" ", "%20")))[1]
 	var texture = ImageTexture.create_from_image(image)
 	tileset["texture"] = texture
 	return tileset
@@ -70,7 +71,7 @@ func _ready():
 	# now iterate over the tilesets referenced in the map
 	# for each download the JSON and the image
 	for tileset in map_data["tilesets"]:
-		# escape the whitsepace but not everything, things like "../" are ot be kept
+		# escape the whitsepace but not everything, things like "../" are to be kept
 		var tileset_url = map_chunk_url_base + "/" + tileset["source"].replace(" ", "%20")
 		# offset to add to the ids of the tileset
 		# so each tileset has a range of ids
