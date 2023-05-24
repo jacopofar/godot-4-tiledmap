@@ -10,17 +10,22 @@ signal load_complete
 # These may change, particularly 2 and 4 are easily done with Godot 4.x
 
 @export var spritesheet_url: String
-var spritesheet_data: Dictionary
-var spritesheet_texture: ImageTexture
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
+	var spritesheet_data: Dictionary
+	var spritesheet_texture: ImageTexture
+	
 	var req = await HttpLoader.load_json(spritesheet_url)
 	spritesheet_data = req[1]
 
 	# Now load the image data
 	# NOTE: it assumes it's a single PNG file
 	var base_url = spritesheet_url.left(spritesheet_url.rfind("/"))
+	# TODO why is the spritesheet ignored here?
+	# is it shared across instances??
+	print("Loaded spritesheet from ", spritesheet_url)
+	print("the image is at ", base_url + "/" + spritesheet_data["meta"]["image"])
 	var image = (await HttpLoader.load_image(base_url + "/" + spritesheet_data["meta"]["image"]))[1]
 	spritesheet_texture = ImageTexture.create_from_image(image)
 	for frame_name in spritesheet_data["frames"].keys():

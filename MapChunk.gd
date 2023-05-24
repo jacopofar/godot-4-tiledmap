@@ -1,5 +1,7 @@
 extends Node2D
 
+var Event = preload("res://events/Event.tscn")
+
 @export var map_chunk_url: String
 var map_data: Dictionary
 var tilesets: Dictionary = {}
@@ -13,6 +15,8 @@ var width_in_tiles: int = -1
 # pixel size of a single tile
 var tile_height: int = -1
 var tile_width: int = -1
+
+var map_chunk_url_base: String
 
 # retrieves a tileset from an URL
 # notice this is asynchronous, call it with: await get_tileset(tileset_url).completed
@@ -60,7 +64,7 @@ func _ready():
 
 	map_data = req[1]
 
-	var map_chunk_url_base = map_chunk_url.left(map_chunk_url.rfind("/"))
+	map_chunk_url_base = map_chunk_url.left(map_chunk_url.rfind("/"))
 
 	height_in_tiles = int(map_data["height"])
 	width_in_tiles = int(map_data["width"])
@@ -132,14 +136,28 @@ func draw_map():
 	
 	var current_z_index = -10 - (10 * int(len(map_data["layers"]) / 2))
 	for layer in map_data["layers"]:
-		current_z_index += 10
-		print(current_z_index)
-		print(layer["type"])
-		if layer["type"] != "tilelayer":
-			continue
 		# layer origin (is always 0 with the current Tiled version, should it just be removed?)
 		var x = layer["x"]
 		var y = layer["y"]
+		
+		# NOTE: object layers affect the z-index!
+		current_z_index += 10
+		if layer["type"] == "objectgroup":
+			for obj in layer["objects"]:
+				var event_url = ""
+				for prop in obj["properties"]:
+					if prop["name"] == "event_path":
+						event_url = map_chunk_url_base + "/" + prop["value"]
+					
+				var new_event = Event.instantiate()
+				new_event.event_url = event_url
+				new_event.set_position(Vector2(
+					obj["x"],
+					obj["y"]
+				))
+				add_child(new_event)
+		if layer["type"] != "tilelayer":
+			continue
 
 		var data = layer["data"]
 

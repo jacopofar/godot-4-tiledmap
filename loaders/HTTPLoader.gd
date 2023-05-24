@@ -19,6 +19,7 @@ func load_json(url: String):
 	# will yield _result, _response_code, _headers, body
 	var http_result = (await http_request.request_completed)
 	if int(http_result[1] / 100) != 2:
+		print("NON 200 HTTP: ", http_result[1], " ", url)
 		return [str("Non-200 HTTP code ", http_result[1]), null]
 	var body = http_result[3]
 	var json = JSON.new()

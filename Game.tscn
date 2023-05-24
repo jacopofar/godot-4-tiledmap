@@ -12,6 +12,7 @@ script = ExtResource("1_h7sek")
 script = ExtResource("2_28t3v")
 
 [node name="RayCast2D" type="RayCast2D" parent="PlayerCharacter"]
+collide_with_areas = true
 
 [node name="Camera2D" type="Camera2D" parent="PlayerCharacter"]
 

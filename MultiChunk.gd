@@ -4,8 +4,8 @@ extends Node2D
 var Chunk = preload("res://MapChunk.tscn")
 
 @export var map_world: String
-@export var load_threshold: int = 1000
-@export var unload_threshold: int = 1600
+@export var load_threshold: int = 800
+@export var unload_threshold: int = 1000
 @export var reaction_squared_distance: int = 32 ** 2
 
 var path_format: String

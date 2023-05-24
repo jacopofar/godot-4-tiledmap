@@ -1,6 +1,8 @@
 extends Node2D
 
-var game_url = "https://jacopofarina.eu/experiments/reference_game/game.json"
+var game_url = "http://127.0.0.1:8000/game.json"
+# var game_url = "https://jacopofarina.eu/experiments/reference_game/game.json"
+
 var AnimatedSpriteFromSheet = preload("res://spritesheets/AnimatedSpriteFromSheet.tscn")
 var MultiChunk = preload("res://MultiChunk.tscn")
 
@@ -21,6 +23,8 @@ func _ready():
 	multichunk.set_name("MultiChunk")
 	add_child(multichunk)
 	set_process(true)
+	
+
 	$MultiChunk.ensure_loaded($PlayerCharacter.position)
 
 
