@@ -6,8 +6,8 @@ var AnimatedSpriteFromSheet = preload("res://spritesheets/AnimatedSpriteFromShee
 
 var on_interact_actions: Array = []
 
-# Called when the node enters the scene tree for the first time.
-func _ready():
+
+func load_http():
 #	print_debug("loading event: ", event_url)
 	var base_url = event_url.left(event_url.rfind("/"))
 	var event_data = (await HttpLoader.load_json(event_url))[1]
@@ -24,6 +24,7 @@ func _ready():
 	character_sprite_animations.set_z_as_relative(false)
 	character_sprite_animations.set_z_index(matching_data["aspect"]["z_index"])
 	add_child(character_sprite_animations)
+	await character_sprite_animations.load_http()
 	# TODO how many collision behaviors are there? Just a boolean?
 	if matching_data["aspect"]["collide"] == "yes":
 		var this_body = Area2D.new()

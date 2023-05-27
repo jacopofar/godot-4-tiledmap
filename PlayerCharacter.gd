@@ -101,7 +101,7 @@ func _unhandled_input(event):
 		else:
 			print("interaction requested, but I am facing the void 😱")
 
-func _on_animated_sprite_from_sheet_load_complete():
+func activate():
 	is_loading = false
 	# TODO this initialization should be in the game JSON
 	$AnimatedSpriteFromSheet.play("down")

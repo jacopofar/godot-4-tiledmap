@@ -29,7 +29,6 @@ var loaded_chunks_rects: Dictionary = {}
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	print("WORLD URL: ", map_world)
 	var world_data = (await HttpLoader.load_json(map_world))[1]
 	assert(world_data["type"] == "world")
 	# example "regexp": "chunk_(\\-?\\d+)_(\\-?\\d+)\\.json"
@@ -97,6 +96,7 @@ func ensure_loaded(pos: Vector2):
 						offsetX + (this_ix) * multiplierX,
 						offsetY + (this_iy) * multiplierY
 					))
+					await new_chunk.load_http()
 					loaded_chunks[this_chunk_idx] = new_chunk
 					loaded_chunks_rects[this_chunk_idx] = chunk_rect
 	var delete_us = PackedStringArray([])

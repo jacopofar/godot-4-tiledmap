@@ -49,7 +49,7 @@ func get_tileset(tileset_url: String) -> Dictionary:
 	tileset["texture"] = texture
 	return tileset
 
-func _ready():
+func load_http():
 	var req = await HttpLoader.load_json(map_chunk_url)
 	if req[0] != null:
 		var color_rect = ColorRect.new()
@@ -156,6 +156,7 @@ func draw_map():
 					obj["y"]
 				))
 				add_child(new_event)
+				await new_event.load_http()
 		if layer["type"] != "tilelayer":
 			continue
 

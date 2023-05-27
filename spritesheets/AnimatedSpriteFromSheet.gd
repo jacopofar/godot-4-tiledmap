@@ -1,5 +1,4 @@
 extends AnimatedSprite2D
-signal load_complete
 # This loads a spritesheet from a tool like https://github.com/asyed94/sprite-sheet-to-json
 # Some assumptions:
 # 1. There is only one image for all the animations
@@ -11,8 +10,8 @@ signal load_complete
 
 @export var spritesheet_url: String
 
-# Called when the node enters the scene tree for the first time.
-func _ready():
+
+func load_http():
 	var spritesheet_data: Dictionary
 	var spritesheet_texture: ImageTexture
 	
@@ -24,8 +23,6 @@ func _ready():
 	var base_url = spritesheet_url.left(spritesheet_url.rfind("/"))
 	# TODO why is the spritesheet ignored here?
 	# is it shared across instances??
-	print("Loaded spritesheet from ", spritesheet_url)
-	print("the image is at ", base_url + "/" + spritesheet_data["meta"]["image"])
 	var image = (await HttpLoader.load_image(base_url + "/" + spritesheet_data["meta"]["image"]))[1]
 	spritesheet_texture = ImageTexture.create_from_image(image)
 	for frame_name in spritesheet_data["frames"].keys():
@@ -51,4 +48,4 @@ func _ready():
 				relevant_frame["h"],
 			))
 			sprite_frames.add_frame(anim_name, thisatlas)
-	emit_signal("load_complete")
+
