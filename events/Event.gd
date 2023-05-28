@@ -3,9 +3,9 @@ extends Node
 var AnimatedSpriteFromSheet = preload("res://spritesheets/AnimatedSpriteFromSheet.tscn")
 
 @export var event_url: String
+@export var props: Dictionary
 
 var on_interact_actions: Array = []
-
 
 func load_http():
 #	print_debug("loading event: ", event_url)
@@ -20,7 +20,7 @@ func load_http():
 
 	var character_sprite_animations = AnimatedSpriteFromSheet.instantiate()
 	character_sprite_animations.spritesheet_url = base_url + "/" + matching_data["aspect"]["spritesheet"]
-	character_sprite_animations.set_name("AnimatedSpriteFromSheet")
+#	character_sprite_animations.set_name("AnimatedSpriteFromSheet")
 	character_sprite_animations.set_z_as_relative(false)
 	character_sprite_animations.set_z_index(matching_data["aspect"]["z_index"])
 	add_child(character_sprite_animations)
@@ -57,7 +57,12 @@ func on_interact():
 		var command = action["command"]
 		if command == "say":
 			var dt = DialogicTimeline.new()
-			dt.events = action["msgs"]
+			var replaced_msgs = []
+			for msg in action["msgs"]:
+				for k in props:
+					msg = msg.replace("$"+k, props[k])
+				replaced_msgs.append(msg)
+			dt.events = replaced_msgs
 			var new_dialog = Dialogic.start(dt)
 			add_child(new_dialog)
 

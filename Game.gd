@@ -1,8 +1,8 @@
 extends Node2D
 
-# var game_url = "http://127.0.0.1:8000/game.json"
+var game_url = "http://127.0.0.1:8000/game.json"
 # var game_url = "https://jacopofarina.eu/experiments/reference_game/game.json"
-var game_url = "https://jacopofarina.eu/experiments/demo_tilegame2/game.json"
+# var game_url = "https://jacopofarina.eu/experiments/demo_tilegame2/game.json"
 
 var AnimatedSpriteFromSheet = preload("res://spritesheets/AnimatedSpriteFromSheet.tscn")
 var MultiChunk = preload("res://MultiChunk.tscn")

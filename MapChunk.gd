@@ -145,12 +145,15 @@ func draw_map():
 		if layer["type"] == "objectgroup":
 			for obj in layer["objects"]:
 				var event_url = ""
+				var event_props = {}
 				for prop in obj["properties"]:
+					event_props[prop["name"]] = prop["value"]
 					if prop["name"] == "event_path":
 						event_url = map_chunk_url_base + "/" + prop["value"]
 					
 				var new_event = Event.instantiate()
 				new_event.event_url = event_url
+				new_event.props = event_props
 				new_event.set_position(Vector2(
 					obj["x"],
 					obj["y"]
