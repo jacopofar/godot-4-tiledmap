@@ -94,12 +94,14 @@ func _unhandled_input(event):
 	if is_interaction:
 		var target = $RayCast2D.get_collider()
 		if target != null:
-			if target.has_method("on_interact"):
-				target.on_interact()
+			if target.get_parent().has_method("on_interact"):
+				target.get_parent().on_interact()
 			else:
-				print_debug("Cannot interact with this")
+				print("Cannot interact with this: ", target, target.get_parent())
+		else:
+			print("interaction requested, but I am facing the void 😱")
 
-func _on_animated_sprite_from_sheet_load_complete():
+func activate():
 	is_loading = false
 	# TODO this initialization should be in the game JSON
 	$AnimatedSpriteFromSheet.play("down")

@@ -1,23 +1,20 @@
-[gd_scene load_steps=5 format=3 uid="uid://cuj7wgscfl1jy"]
+[gd_scene load_steps=4 format=3 uid="uid://cuj7wgscfl1jy"]
 
 [ext_resource type="Script" path="res://Game.gd" id="1_h7sek"]
-[ext_resource type="PackedScene" uid="uid://c4yxdqetit5kf" path="res://MultiChunk.tscn" id="2_4qp2a"]
 [ext_resource type="Script" path="res://PlayerCharacter.gd" id="2_28t3v"]
-[ext_resource type="PackedScene" uid="uid://c6cwkr7rfgc2m" path="res://spritesheets/AnimatedSpriteFromSheet.tscn" id="4_a5obb"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_g3dre"]
 
 [node name="Game" type="Node2D"]
 script = ExtResource("1_h7sek")
-
-[node name="MultiChunk" parent="." instance=ExtResource("2_4qp2a")]
 
 [node name="PlayerCharacter" type="CharacterBody2D" parent="."]
 script = ExtResource("2_28t3v")
 
 [node name="RayCast2D" type="RayCast2D" parent="PlayerCharacter"]
+collide_with_areas = true
 
 [node name="Camera2D" type="Camera2D" parent="PlayerCharacter"]
-current = true
 
-[node name="AnimatedSpriteFromSheet" parent="PlayerCharacter" instance=ExtResource("4_a5obb")]
-
-[connection signal="load_complete" from="PlayerCharacter/AnimatedSpriteFromSheet" to="PlayerCharacter" method="_on_animated_sprite_from_sheet_load_complete"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PlayerCharacter"]
+shape = SubResource("RectangleShape2D_g3dre")

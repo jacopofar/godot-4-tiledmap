@@ -3,9 +3,9 @@ extends Node2D
 # This parses a Tiled world file and loads/unloads chunks based on the position
 var Chunk = preload("res://MapChunk.tscn")
 
-@export var map_world: String = "https://jacopofarina.eu/experiments/reference_game/maps/second/world.world"
-@export var load_threshold: int = 1000
-@export var unload_threshold: int = 1600
+@export var map_world: String
+@export var load_threshold: int = 800
+@export var unload_threshold: int = 1000
 @export var reaction_squared_distance: int = 32 ** 2
 
 var path_format: String
@@ -96,6 +96,7 @@ func ensure_loaded(pos: Vector2):
 						offsetX + (this_ix) * multiplierX,
 						offsetY + (this_iy) * multiplierY
 					))
+					await new_chunk.load_http()
 					loaded_chunks[this_chunk_idx] = new_chunk
 					loaded_chunks_rects[this_chunk_idx] = chunk_rect
 	var delete_us = PackedStringArray([])

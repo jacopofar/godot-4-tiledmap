@@ -1,5 +1,7 @@
 extends Node2D
 
+var Event = preload("res://events/Event.tscn")
+
 @export var map_chunk_url: String
 var map_data: Dictionary
 var tilesets: Dictionary = {}
@@ -14,12 +16,13 @@ var width_in_tiles: int = -1
 var tile_height: int = -1
 var tile_width: int = -1
 
+var map_chunk_url_base: String
+
 # retrieves a tileset from an URL
 # notice this is asynchronous, call it with: await get_tileset(tileset_url).completed
 func get_tileset(tileset_url: String) -> Dictionary:
 	var base_url = tileset_url.left(tileset_url.rfind("/"))
 	var tileset = {}
-
 	var tileset_data = (await HttpLoader.load_json(tileset_url))[1]
 	tileset["tile_width"] = int(tileset_data["tilewidth"])
 	tileset["tile_height"] = int(tileset_data["tileheight"])
@@ -40,12 +43,13 @@ func get_tileset(tileset_url: String) -> Dictionary:
 				tileset["animations"][int(tile_extra_metadata["id"])] = gid_frames
 
 	# now download the image for the tileset
-	var image = (await HttpLoader.load_image(base_url + "/" + tileset_data["image"]))[1]
+	# escape the whitsepace but not everything, things like "../" are to be kept
+	var image = (await HttpLoader.load_image(base_url + "/" + tileset_data["image"].replace(" ", "%20")))[1]
 	var texture = ImageTexture.create_from_image(image)
 	tileset["texture"] = texture
 	return tileset
 
-func _ready():
+func load_http():
 	var req = await HttpLoader.load_json(map_chunk_url)
 	if req[0] != null:
 		var color_rect = ColorRect.new()
@@ -60,7 +64,7 @@ func _ready():
 
 	map_data = req[1]
 
-	var map_chunk_url_base = map_chunk_url.left(map_chunk_url.rfind("/"))
+	map_chunk_url_base = map_chunk_url.left(map_chunk_url.rfind("/"))
 
 	height_in_tiles = int(map_data["height"])
 	width_in_tiles = int(map_data["width"])
@@ -71,7 +75,8 @@ func _ready():
 	# now iterate over the tilesets referenced in the map
 	# for each download the JSON and the image
 	for tileset in map_data["tilesets"]:
-		var tileset_url = map_chunk_url_base + "/" + tileset["source"]
+		# escape the whitsepace but not everything, things like "../" are to be kept
+		var tileset_url = map_chunk_url_base + "/" + tileset["source"].replace(" ", "%20")
 		# offset to add to the ids of the tileset
 		# so each tileset has a range of ids
 		# the same tileset may have different firstgid checked different maps
@@ -126,12 +131,37 @@ func get_animation_from_gid(gid:int) -> SpriteFrames:
 		return null
 
 func draw_map():
+	# NOTE: non-tilelayer layers contribute to the z_index logic too
+	# assume that the "middle" layer is 0
+	
+	var current_z_index = -10 - (10 * int(len(map_data["layers"]) / 2))
 	for layer in map_data["layers"]:
-		if layer["type"] != "tilelayer":
-			continue
 		# layer origin (is always 0 with the current Tiled version, should it just be removed?)
 		var x = layer["x"]
 		var y = layer["y"]
+		
+		# NOTE: object layers affect the z-index!
+		current_z_index += 10
+		if layer["type"] == "objectgroup":
+			for obj in layer["objects"]:
+				var event_url = ""
+				var event_props = {}
+				for prop in obj["properties"]:
+					event_props[prop["name"]] = prop["value"]
+					if prop["name"] == "event_path":
+						event_url = map_chunk_url_base + "/" + prop["value"]
+					
+				var new_event = Event.instantiate()
+				new_event.event_url = event_url
+				new_event.props = event_props
+				new_event.set_position(Vector2(
+					obj["x"],
+					obj["y"]
+				))
+				add_child(new_event)
+				await new_event.load_http()
+		if layer["type"] != "tilelayer":
+			continue
 
 		var data = layer["data"]
 
@@ -151,6 +181,7 @@ func draw_map():
 				anims.set_position(Vector2((pos_rel_x * tile_height) + x, (pos_rel_y * tile_width) + y))
 				anims.frames = anim
 				anims.play("anim")
+				anims.set_z_index(current_z_index)
 				add_child(anims)
 			else:
 				var this_atlas = get_atlas_from_gid(gid)
@@ -158,4 +189,5 @@ func draw_map():
 
 				ns.set_position(Vector2((pos_rel_x * tile_height) + x, (pos_rel_y * tile_width) + y))
 				ns.set_texture(this_atlas)
+				ns.set_z_index(current_z_index)
 				add_child(ns)

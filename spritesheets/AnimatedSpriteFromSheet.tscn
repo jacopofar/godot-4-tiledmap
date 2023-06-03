@@ -5,5 +5,5 @@
 [sub_resource type="SpriteFrames" id="SpriteFrames_pssjo"]
 
 [node name="AnimatedSpriteFromSheet" type="AnimatedSprite2D"]
-frames = SubResource("SpriteFrames_pssjo")
+sprite_frames = SubResource("SpriteFrames_pssjo")
 script = ExtResource("1_g6i3q")
