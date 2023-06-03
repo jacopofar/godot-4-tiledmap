@@ -2,11 +2,12 @@
 Dynamically loading Tiled maps in Godot
 
 
-This is a Godot 3.5 project that shows how it's possible to load a Tiled map in JSON from an HTTP server.
+This is a Godot 4 project that shows how it's possible to load a Tiled map in JSON from an HTTP server.
 
 # Features
 
 * maps, tilesets and assets are loaded at runtime
+* Tiled world files are used to split large maps into chunks to be loaded and unloaded as the player character moves
 * layers
 * animated tiles
 
