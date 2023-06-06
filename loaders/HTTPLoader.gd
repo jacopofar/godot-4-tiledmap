@@ -39,7 +39,7 @@ func load_json(url: String):
 		json_cache = {}
 	json_cache[url] = json.get_data()
 #	print("loaded ", url)
-	
+
 	return [null, json.get_data()]
 
 func load_image(url: String):
