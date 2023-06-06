@@ -25,6 +25,9 @@ func load_http():
 	# is it shared across instances??
 	var image = (await HttpLoader.load_image(base_url + "/" + spritesheet_data["meta"]["image"]))[1]
 	spritesheet_texture = ImageTexture.create_from_image(image)
+	# this has to be done because sprite_frames are shared across nodes
+	# TODO ideally it can be reused across sprites based on the same spritesheet file
+	sprite_frames = sprite_frames.duplicate()
 	for frame_name in spritesheet_data["frames"].keys():
 		var anim_name = frame_name.left(frame_name.rfind("-"))
 		# is this a frame of an animation already added? if so ignore it
