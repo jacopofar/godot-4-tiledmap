@@ -11,6 +11,9 @@ func load_http():
 #	print_debug("loading event: ", event_url)
 	var base_url = event_url.left(event_url.rfind("/"))
 	var event_data = (await HttpLoader.load_json(event_url))[1]
+	if event_data == null:
+		push_error("No event data found at ", event_url)
+		return
 
 	var matching_data = {}
 	for event_state in event_data:
