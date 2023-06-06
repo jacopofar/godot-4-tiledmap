@@ -2,6 +2,11 @@ extends Node
 # caching is very simple here
 # for fancier approaches see: https://github.com/fenix-hub/gdcache
 
+# here HTTPRequest is used, high level node over HTTPClient
+# HTTPCLient is quite a mess to use, and in particular to troubleshoot
+# see https://gist.github.com/bibby/9150165
+# potentially is faster because it reuses the same connection to the host
+
 var CACHE_SIZE = 60
 
 var json_cache: Dictionary = {}
