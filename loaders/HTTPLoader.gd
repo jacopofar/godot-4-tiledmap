@@ -12,9 +12,21 @@ var CACHE_SIZE = 60
 var json_cache: Dictionary = {}
 var image_cache: Dictionary = {}
 
+func normalize_url(url: String):
+	# ugly but necessary :(
+	var url_parts = url.replace(" ", "%20").split("/")
+	for i in range(url_parts.size()):
+		if url_parts.size() <= i:
+			# the size changes as we remove elements
+			break
+		if url_parts[i] == '..':
+			url_parts.remove_at(i)
+			url_parts.remove_at(i - 1)
+	return "/".join(url_parts)
 
 
 func load_json(url: String):
+	url = normalize_url(url)
 #	print("loading ", url)
 	if json_cache.has(url):
 #		print("cache hit for ", url)
@@ -43,6 +55,7 @@ func load_json(url: String):
 	return [null, json.get_data()]
 
 func load_image(url: String):
+	url = normalize_url(url)
 	if image_cache.has(url):
 		return [null, image_cache[url]]
 
