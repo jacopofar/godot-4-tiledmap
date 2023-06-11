@@ -92,7 +92,6 @@ func load_http():
 		var firstgid = int(tileset["firstgid"])
 
 		tilesets[firstgid] = await get_tileset(tileset_url)
-#		print(tilesets)
 	# finally instantiate everything in the scene
 	draw_map()
 
@@ -214,7 +213,6 @@ func draw_map():
 				ns.set_z_index(current_z_index)
 				add_child(ns)
 			if is_collision(gid):
-				print("collision detected!")
 				var this_body = StaticBody2D.new()
 				this_body.set_position(tile_position)
 				var collision = CollisionShape2D.new()

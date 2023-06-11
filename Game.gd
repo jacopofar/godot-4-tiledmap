@@ -20,7 +20,7 @@ func _ready():
 	await player_sprite_animations.load_http()
 	$PlayerCharacter.add_child(player_sprite_animations)
 	$PlayerCharacter.set_z_index(1000)
-	
+
 	var multichunk = MultiChunk.instantiate()
 	multichunk.map_world = base_url + "/" + game_data["initialWorld"]
 	multichunk.set_name("MultiChunk")
@@ -28,7 +28,6 @@ func _ready():
 	$PlayerCharacter.activate()
 	set_process(true)
 	# now it's possible to load/unload chunks
-	print("process can start")
 	$MultiChunk.ensure_loaded($PlayerCharacter.position)
 
 
