@@ -7,6 +7,7 @@ var map_data: Dictionary
 var tilesets: Dictionary = {}
 var atlas_textures: Dictionary = {}
 var animated_frames: Dictionary = {}
+var collisions: Dictionary = {}
 
 # size in amount of tiles
 var height_in_tiles: int = -1
@@ -19,7 +20,6 @@ var tile_width: int = -1
 var map_chunk_url_base: String
 
 # retrieves a tileset from an URL
-# notice this is asynchronous, call it with: await get_tileset(tileset_url).completed
 func get_tileset(tileset_url: String) -> Dictionary:
 	var base_url = tileset_url.left(tileset_url.rfind("/"))
 	var tileset = {}
@@ -29,18 +29,27 @@ func get_tileset(tileset_url: String) -> Dictionary:
 	tileset["image_width"] = int(tileset_data["imagewidth"])
 	tileset["image_height"] = int(tileset_data["imageheight"])
 	tileset["animations"] = {}
+	tileset["collisions"] = {}
 	tileset["calculated_size"] = (tileset["image_width"] * tileset["image_height"]) / (tileset["tile_width"] * tileset["tile_height"])
 
-	# read the animation key if present, used later to recreate animated tiles
+	# read the animation and property keys if present
 	if "tiles" in tileset_data:
+		# this can be an animation, properties, or other things
 		for tile_extra_metadata in tileset_data["tiles"]:
-			# this can be an animation or other properties
 			if "animation" in tile_extra_metadata:
 				# this is an array with frames having duration and gid. gid is relative to the tileset
 				var gid_frames = []
 				for anim_frame_desc in tile_extra_metadata["animation"]:
 					gid_frames.append({"duration": int(anim_frame_desc["duration"]), "gid": int(anim_frame_desc["tileid"])})
 				tileset["animations"][int(tile_extra_metadata["id"])] = gid_frames
+			# read collisions
+			if "properties" in tile_extra_metadata:
+				for prop in tile_extra_metadata["properties"]:
+					if prop["name"] == "collide":
+						if prop["value"]:
+							tileset["collisions"][int(tile_extra_metadata["id"])] = true
+
+
 
 	# now download the image for the tileset
 	# escape the whitsepace but not everything, things like "../" are to be kept
@@ -108,7 +117,7 @@ func get_atlas_from_gid(gid: int) -> AtlasTexture:
 	return atlas_textures[gid]
 
 # gets the sprite frames or null if not an animation
-func get_animation_from_gid(gid:int) -> SpriteFrames:
+func get_animation_from_gid(gid: int) -> SpriteFrames:
 	# if it's not an animation but known static tile, immediately return null
 	if gid in atlas_textures:
 		return null
@@ -130,16 +139,28 @@ func get_animation_from_gid(gid:int) -> SpriteFrames:
 				return new_animation
 		return null
 
+
+func is_collision(gid: int) -> bool:
+	if not gid in collisions:
+		for candidate_gid in tilesets.keys():
+			if (gid >= candidate_gid) and (gid <= candidate_gid + (tilesets[candidate_gid]["calculated_size"])):
+				if gid - candidate_gid in tilesets[candidate_gid]["collisions"]:
+					collisions[gid] = tilesets[candidate_gid]["collisions"][gid - candidate_gid]
+				else:
+					collisions[gid] = false
+				break
+	return collisions[gid]
+
 func draw_map():
 	# NOTE: non-tilelayer layers contribute to the z_index logic too
 	# assume that the "middle" layer is 0
-	
+
 	var current_z_index = -10 - (10 * int(len(map_data["layers"]) / 2))
 	for layer in map_data["layers"]:
 		# layer origin (is always 0 with the current Tiled version, should it just be removed?)
 		var x = layer["x"]
 		var y = layer["y"]
-		
+
 		# NOTE: object layers affect the z-index!
 		current_z_index += 10
 		if layer["type"] == "objectgroup":
@@ -150,7 +171,7 @@ func draw_map():
 					event_props[prop["name"]] = prop["value"]
 					if prop["name"] == "event_path":
 						event_url = map_chunk_url_base + "/" + prop["value"]
-					
+
 				var new_event = Event.instantiate()
 				new_event.event_url = event_url
 				new_event.props = event_props
@@ -175,10 +196,11 @@ func draw_map():
 			tile_idx += 1
 			if gid == 0:
 				continue
+			var tile_position = Vector2((pos_rel_x * tile_height) + x, (pos_rel_y * tile_width) + y)
 			var anim = get_animation_from_gid(gid)
 			if anim != null:
 				var anims = AnimatedSprite2D.new()
-				anims.set_position(Vector2((pos_rel_x * tile_height) + x, (pos_rel_y * tile_width) + y))
+				anims.set_position(tile_position)
 				anims.frames = anim
 				anims.play("anim")
 				anims.set_z_index(current_z_index)
@@ -187,7 +209,16 @@ func draw_map():
 				var this_atlas = get_atlas_from_gid(gid)
 				var ns = Sprite2D.new()
 
-				ns.set_position(Vector2((pos_rel_x * tile_height) + x, (pos_rel_y * tile_width) + y))
+				ns.set_position(tile_position)
 				ns.set_texture(this_atlas)
 				ns.set_z_index(current_z_index)
 				add_child(ns)
+			if is_collision(gid):
+				print("collision detected!")
+				var this_body = StaticBody2D.new()
+				this_body.set_position(tile_position)
+				var collision = CollisionShape2D.new()
+				collision.shape = RectangleShape2D.new()
+				collision.debug_color = Color.YELLOW
+				this_body.add_child(collision)
+				add_child(this_body)
