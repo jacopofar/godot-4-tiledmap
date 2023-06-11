@@ -1,0 +1,9 @@
+[gd_scene load_steps=3 format=3 uid="uid://cfijhpk1jb0by"]
+
+[ext_resource type="Script" path="res://spritesheets/Pawn.gd" id="1_rfbfk"]
+[ext_resource type="PackedScene" uid="uid://c6cwkr7rfgc2m" path="res://spritesheets/AnimatedSpriteFromSheet.tscn" id="2_d4kny"]
+
+[node name="Pawn" type="CharacterBody2D"]
+script = ExtResource("1_rfbfk")
+
+[node name="AnimatedSpriteFromSheet" parent="." instance=ExtResource("2_d4kny")]

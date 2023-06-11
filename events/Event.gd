@@ -1,18 +1,17 @@
 extends Node
 
-var AnimatedSpriteFromSheet = preload("res://spritesheets/AnimatedSpriteFromSheet.tscn")
+var Pawn = preload("res://spritesheets/Pawn.tscn")
 
 @export var event_url: String
 @export var props: Dictionary
 
-var character_sprite_animations
+var event_pawn
 
 var on_interact_actions: Array = []
 
 var path_moves: PackedStringArray = []
 var path_time_in_cycle: float
 var path_step_duration: float
-var path_movement_speed: float
 var path_total_time: float
 
 func load_http():
@@ -29,33 +28,28 @@ func load_http():
 		matching_data = event_state
 		break
 
-	character_sprite_animations = AnimatedSpriteFromSheet.instantiate()
-	character_sprite_animations.spritesheet_url = base_url + "/" + matching_data["aspect"]["spritesheet"]
-#	character_sprite_animations.set_name("AnimatedSpriteFromSheet")
-	character_sprite_animations.set_z_as_relative(false)
-	character_sprite_animations.set_z_index(matching_data["aspect"]["z_index"])
-	add_child(character_sprite_animations)
-	await character_sprite_animations.load_http()
+	event_pawn = Pawn.instantiate()
+	event_pawn.spritesheet_url = base_url + "/" + matching_data["aspect"]["spritesheet"]
+#	event_pawn.set_name("AnimatedSpriteFromSheet")
+	event_pawn.set_z_as_relative(false)
+	event_pawn.set_z_index(matching_data["aspect"]["z_index"])
+	add_child(event_pawn)
+	await event_pawn.load_http()
 	# TODO how many collision behaviors are there? Just a boolean?
 	if matching_data["aspect"]["collide"] == "yes":
-		var this_body = Area2D.new()
-		var collision = CollisionShape2D.new()
-		# TODO docs says there must be an "owner", but what is it??
-		this_body.create_shape_owner(self)
-		collision.shape = RectangleShape2D.new()
-		collision.debug_color = Color.RED
-		this_body.add_child(collision)
+		event_pawn.enable_collisions()
+	else:
+		if matching_data.has("on_interact"):
+			# meh, weird naming. But hey, it's explicit!
+			event_pawn.enable_interactions_without_collisions()
+	if matching_data.has("on_interact"):
+		event_pawn.connect("interacted", on_interact)
 
-		add_child(this_body)
-	# by default it's shown pointing downwards
-	# without this, nothing is shown at all
-	character_sprite_animations.play("down")
-	character_sprite_animations.stop()
 	if matching_data["aspect"].has("path"):
 		path_moves = matching_data["aspect"]["path"]
 		path_time_in_cycle = 0
 		path_step_duration = matching_data["aspect"]["step_duration"]
-		path_movement_speed = matching_data["aspect"]["movement_speed"]
+		event_pawn.movement_speed = matching_data["aspect"]["movement_speed"]
 		path_total_time = path_step_duration * path_moves.size()
 	# use this to troubleshoot the event position
 #	var color_rect = ColorRect.new()
@@ -89,5 +83,4 @@ func _process(delta):
 	if path_time_in_cycle > path_total_time:
 		path_time_in_cycle -= path_total_time
 	var current_step = path_moves[int(path_time_in_cycle / path_step_duration)]
-	character_sprite_animations.play(current_step)
-	# TODO add move_and_collid or similar
+	event_pawn.move(current_step, delta)

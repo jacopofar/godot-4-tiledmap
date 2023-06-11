@@ -16,9 +16,11 @@ this is probably not *good* GDScript code at all, but it works
 See the reference "game" for a suitable Tiled map: https://github.com/jacopofar/reference_game
 
 ## TO DO
-- [ ] Allow events to move around following a path
-- [ ] Let events collide with obstacles
-- [ ] Let events collide with the player
+- [x] Allow events to move around following a path
+- [ ] Add collisions to tiles
+- [x] Let events collide with obstacles
+- [x] Let events collide with the player
+    - [ ] Let events react with collision with the player
 - [ ] Global variable "storage" (singleton)
 - [ ] Extend the events to do more:
     - [ ] Teleport
