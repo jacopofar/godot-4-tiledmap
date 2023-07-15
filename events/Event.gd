@@ -74,7 +74,7 @@ func on_interact():
 				replaced_msgs.append(msg)
 			dt.events = replaced_msgs
 			var new_dialog = Dialogic.start(dt)
-			add_child(new_dialog)
+#			add_child(new_dialog)
 
 func _process(delta):
 	if path_moves.is_empty():
