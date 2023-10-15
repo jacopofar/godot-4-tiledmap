@@ -7,6 +7,7 @@ var game_url = "http://127.0.0.1:8000/game.json"
 var AnimatedSpriteFromSheet = preload("res://spritesheets/AnimatedSpriteFromSheet.tscn")
 var MultiChunk = preload("res://MultiChunk.tscn")
 
+var boolean_flags: Dictionary = {}
 
 func _ready():
 	# disable process or will try to fetch chunks before having a player or a multichunk
@@ -34,3 +35,11 @@ func _ready():
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta):
 	$MultiChunk.ensure_loaded($PlayerCharacter.position)
+
+func set_boolean(variable_name, value):
+	# TODO here should check which event is affected to reload it
+	boolean_flags[variable_name] = value
+	emit_signal("boolean_changed" + variable_name, [variable_name, value])
+
+func get_boolean(variable_name, default_value = false):
+	return boolean_flags.get(variable_name, default_value)

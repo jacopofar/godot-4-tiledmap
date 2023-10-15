@@ -21,8 +21,8 @@ See the reference "game" for a suitable Tiled map: https://github.com/jacopofar/
 - [x] Let events collide with obstacles
 - [x] Let events collide with the player
     - [ ] Let events react with collision with the player
-- [ ] Store globally the game details (e.g. tile size) to use them around
 - [ ] Global variable "storage" (singleton)
+- [ ] Store globally the game details (e.g. tile size) to use them around
 - [ ] Extend the events to do more:
     - [ ] Teleport
     - [ ] Change variable in storage
