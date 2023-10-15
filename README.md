@@ -21,12 +21,12 @@ See the reference "game" for a suitable Tiled map: https://github.com/jacopofar/
 - [x] Let events collide with obstacles
 - [x] Let events collide with the player
     - [ ] Let events react with collision with the player
-- [ ] Global variable "storage" (singleton)
+- [x] Central variable storage
 - [ ] Store globally the game details (e.g. tile size) to use them around
 - [ ] Extend the events to do more:
     - [ ] Teleport
-    - [ ] Change variable in storage
+    - [x] Change variable in storage
+- [x] Allow events to have conditional states
 - [ ] allow remote control mode (the server can send keys, read variables state and take screenshots), useful for tests too
 - [ ] schema validation outside godot? makes sense to be in the same repo still
-- [ ] Allow events to have conditional states
 - [ ] Handle event chunk migration (the event may move to a different chunk than the starting one, and must survive the chunk unload)
