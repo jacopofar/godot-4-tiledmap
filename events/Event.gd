@@ -29,6 +29,7 @@ func load_http():
 			var signal_name = "boolean_changed" + con[0]
 			if not get_node('/root/Game').has_user_signal(signal_name):
 				get_node('/root/Game').add_user_signal(signal_name)
+			if not get_node('/root/Game').is_connected(signal_name, on_boolean_changed):
 				get_node('/root/Game').connect(signal_name, on_boolean_changed)
 
 	# load the event logic
@@ -52,8 +53,8 @@ func load_actions():
 		push_error("No matching event data found at ", event_url)
 		return
 	# for debugging
-	if len(event_data) > 1:
-		print_debug("match found:", matching_data)
+#	if len(event_data) > 1:
+#		print_debug("conditional match found:", matching_data)
 	if event_pawn != null:
 		event_pawn.queue_free()
 	event_pawn = Pawn.instantiate()
