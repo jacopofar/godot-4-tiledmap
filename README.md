@@ -24,7 +24,7 @@ See the reference "game" for a suitable Tiled map: https://github.com/jacopofar/
 - [x] Central variable storage
 - [ ] Store globally the game details (e.g. tile size) to use them around
 - [ ] Extend the events to do more:
-    - [ ] Teleport
+    - [x] Teleport
     - [x] Change variable in storage
 - [x] Allow events to have conditional states
 - [ ] allow remote control mode (the server can send keys, read variables state and take screenshots), useful for tests too

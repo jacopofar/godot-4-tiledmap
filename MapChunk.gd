@@ -117,26 +117,30 @@ func get_atlas_from_gid(gid: int) -> AtlasTexture:
 
 # gets the sprite frames or null if not an animation
 func get_animation_from_gid(gid: int) -> SpriteFrames:
+	# cached? get it
+	if gid in animated_frames:
+		return animated_frames[gid]
 	# if it's not an animation but known static tile, immediately return null
 	if gid in atlas_textures:
 		return null
-	if gid in animated_frames:
-		return animated_frames[gid]
-	else:
-		for candidate_gid in tilesets.keys():
-			if (gid >= candidate_gid) and (gid <= candidate_gid + (tilesets[candidate_gid]["calculated_size"])):
-				var relative_gid = gid - candidate_gid
-				if not relative_gid in tilesets[candidate_gid]["animations"]:
-					return null
-				var new_animation = SpriteFrames.new()
-				new_animation.add_animation("anim")
-
-				for single_frame in tilesets[candidate_gid]["animations"][relative_gid]:
-					# TODO here only the frame key is used, duration is ignored
-					new_animation.add_frame("anim", get_atlas_from_gid(candidate_gid + single_frame["gid"]))
-				animated_frames[gid] = new_animation
-				return new_animation
-		return null
+	for candidate_gid in tilesets.keys():
+		if (gid >= candidate_gid) and (gid <= candidate_gid + (tilesets[candidate_gid]["calculated_size"])):
+			var relative_gid = gid - candidate_gid
+			if not relative_gid in tilesets[candidate_gid]["animations"]:
+				return null
+			var new_animation = SpriteFrames.new()
+			new_animation.add_animation("anim")
+			var this_speed = new_animation.get_animation_speed("anim")
+			for single_frame in tilesets[candidate_gid]["animations"][relative_gid]:
+				# duration is in frames
+				new_animation.add_frame(
+					"anim",
+					get_atlas_from_gid(candidate_gid + single_frame["gid"]),
+					(single_frame["duration"] / 1000.0) * this_speed
+				)
+			animated_frames[gid] = new_animation
+			return new_animation
+	return null
 
 
 func is_collision(gid: int) -> bool:

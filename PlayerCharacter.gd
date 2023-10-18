@@ -101,7 +101,8 @@ func _unhandled_input(event):
 		else:
 			print("interaction requested, but I am facing the void 😱")
 
-func activate():
+func activate(initial_position: Vector2):
+	set_position(initial_position)
 	is_loading = false
 	# TODO this initialization should be in the game JSON
 	$AnimatedSpriteFromSheet.play("down")

@@ -123,6 +123,10 @@ func run_actions(actions):
 				var variable_name: String = action["variable"]
 				var value: bool = action["value"]
 				get_node('/root/Game').set_boolean(variable_name, value)
+			"teleport":
+				if get_node('/root/Game').get_current_world() != action["world"]:
+					get_node('/root/Game').change_world(action["world"])
+				get_node('/root/Game/PlayerCharacter').set_position(Vector2(action["x"], action["y"]))
 			_:
 				printerr("Unknown command ", command)
 
