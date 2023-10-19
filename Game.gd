@@ -12,6 +12,14 @@ var boolean_flags: Dictionary = {}
 var multichunk = null
 
 func _ready():
+	if OS.get_name() == "Web":
+		JavaScriptBridge.eval("window.alert('JS environment detected!')")
+		var current_url: String = JavaScriptBridge.eval("location.href")
+		if current_url.contains("/index.html"):
+			current_url = current_url.replace("/index.html", "")
+		game_url = current_url + "/game.json"
+		print("This is a web environment, assuming assets are local, rewritten game url: " + game_url)
+
 	multichunk = MultiChunk.instantiate()
 	# disable process or will try to fetch chunks before having a player or a multichunk
 	set_process(false)
