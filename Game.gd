@@ -18,6 +18,7 @@ func _ready():
 		if current_url.contains("/index.html"):
 			current_url = current_url.replace("/index.html", "")
 		game_url = current_url + "/game.json"
+		base_url = game_url.left(game_url.rfind("/"))
 		print("This is a web environment, assuming assets are local, rewritten game url: " + game_url)
 
 	multichunk = MultiChunk.instantiate()
